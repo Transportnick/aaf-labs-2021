@@ -105,27 +105,37 @@ public class Main {
     }
     private static void selectHandler(String command) {
         System.out.print("Select data from table " + " ");
-        String cmd[] = command.split("(F|f)(R|r)(O|o)(M|m)", 2);
-        String[] array = cmd[0].replaceFirst("[ ]*(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)[ ]*", "")
-                .replaceAll("[ ]*(F|f)(R|r)(O|o)(M|m)*", "")
+        String cmd = command;
+        String[] array = cmd.replaceFirst("[ ]*(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)[ ]*", "")
+                .replaceAll("[ ]*(F|f)(R|r)(O|o)(M|m)*[A-Z, a-z, 0-9]*[ ]*", "")
                 .replaceAll("[(|)|,|;|]", "")
-                .replaceAll("[ ][ ]", " ")
+                .replaceAll("[ ]*[ ]", " ")
                 .split(" ");
-        String[] array2 = cmd[1]
+        System.out.println(Arrays.toString(array));
+        for (int i = 0; i < array.length ; i++) {
+            System.out.println("      condition : " + array[i]);
+        }
+        String[] array1 = cmd.replaceFirst("[ ]*(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)*[ ]*[A-Z, a-z, 0-9]*[ ]*(F|f)(R|r)(O|o)(M|m)[ ]*", "")
                 .replaceAll("[(|)|,|;|]", "")
-                .replaceAll("[ ][ ]", " ")
+                .replaceAll("[ ]*[ ]", " ")
                 .split(" ");
+        System.out.println(Arrays.toString(array1));
+        for (int i = 0; i < array1.length ; i++) {
+            System.out.println("Table names : " + array1[i]);
+        }
+        //String[] array2 = cmd.replaceFirst();
+                //.replaceAll("[(|)|,|;|]", "")
+                //.replaceAll("[ ][ ]", " ")
+                //.split(" ");
 
         System.out.println(Arrays.toString(array));
-        System.out.println(Arrays.toString(array2));
-        System.out.println("Table name : " + array2[0]);
-        for (int i = 1; i < array.length; i++) {
-            System.out.println("      condition : " + array[i]);
+        //System.out.println(Arrays.toString(array2));
+        //System.out.println("Table name : " + array2[0]);
             // 1) get table name from command;
             // 2) get column names from command;
             // 3) get WHERE condition;
             // 4) read data from table according to condition and print;
-        }
+
     }
     private static void deleteHandler(String command) {
         System.out.print("Delete data from table " + " ");
@@ -147,4 +157,3 @@ public class Main {
         }
     }
 }
-
