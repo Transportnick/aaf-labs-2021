@@ -1,70 +1,58 @@
 package com.company;
 
-import com.github.freva.asciitable.AsciiTable;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.github.freva.asciitable.AsciiTable.*;
-
 public class Main {
-    private static final String Create = "((C|c)(r|R)(e|E)(a|A)(t|T)(E|e)[ ]*[a-z,A-Z,0-9]*[ ]*[(][a-z,A-Z,0-9, ]*[)])|((C|c)(r|R)(e|E)(a|A)(t|T)(E|e)[ ]*[a-z,A-Z,0-9]*)";
-    private static final String Insert = "[ ]*(((I|i)(N|n)(S|s)(E|e)(R|r)(T|t)[ ]((I|i)(n|N)(T|t)(O|o)))|((I|i)(N|n)(S|s)(E|e)(R|r)(T|t)))[ ]*[A-Z,a-z,0-9]*[ ]*[(][A-Z,a-z,0-9, ]*[)]*[ ]*";
-    private static final String Select = "[ ]*(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)[ ]*[A-Z, a-z, 0-9]*[ ]*(F|f)(R|r)(O|o)(M|m)[ ]*[A-Z, a-z, 0-9]*[ ]*";
-    private static final String Delete = "[ ]*(D|d)(E|e)(L|l)(E|e)(T|t)(E|e)[ ]*(F|f)(R|r)(O|o)(M|m)[ ]*[A-Z, a-z, 0-9]*[ ]*";
+    private static final String Create = "((C|c)(r|R)(e|E)(a|A)(t|T)(E|e)[ ]*[a-z,A-Z,0-9]*[ ]*[(][a-z,A-Z,0-9, ]*[)]*)";
+    private static final String Insert = "[ ]*(((I|i)(N|n)(S|s)(E|e)(R|r)(T|t)[ ]((I|i)(n|N)(T|t)(O|o)))|((I|i)(N|n)(S|s)(E|e)(R|r)(T|t)))[ ]*[A-Z,a-z,0-9]*[ ]*[(][A-Z,a-z,-?0-9, ]*[)]*[ ]*";
+    private static final String Select = "[ ]*(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)[ ]*[A-Z, a-z, 0-9, * ]*[ ]*(F|f)(R|r)(O|o)(M|m)[ ]*[A-Z, a-z, 0-9]*(([ ]*)|([ ]*((W|w)(H|h)(E|e)(R|r)(E|e))*[ ]*[A-Z, a-z, 0-9, ]*[ ]*))";
+    private static final String Delete = "[ ]*(D|d)(E|e)(L|l)(E|e)(T|t)(E|e)(([ ]*)|([ ]*(F|f)(R|r)(O|o)(M|m)[ ]*))[A-Z, a-z, 0-9]*[ ]*";
     private static final String Exit = "[ ]*[.](E|e)(X|x)(I|i)(T|t)*[ ]*";
     private static final Pattern patternCreate = Pattern.compile(Create);
     private static final Pattern patternInsert = Pattern.compile(Insert);
     private static final Pattern patternSelect = Pattern.compile(Select);
     private static final Pattern patternDelete = Pattern.compile(Delete);
     private static final Pattern patternExit = Pattern.compile(Exit);
- 
+
     // Map хранит пары ключ - данные
     // ключ - имя таблицы
     // данные - лист содержащий список полей таблицы
     static Map<String, List<String>> listOfTables = new HashMap<>();
     static Map<String, List<List<Integer>>> listOfTablesData = new HashMap<>();
+
     public static void main(String[] args) {
 
         System.out.println("Hello! Enter your command.If you want to finish enter .EXIT");
 
-        // Enter data using BufferedReader
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(System.in));
+        Scanner scanner = new Scanner(System.in);
         boolean exit = false;
-        while (exit == false) {
+        while (!exit) {
             // Reading data using readLine
-            try {
-                System.out.print(" > ");
-                StringBuilder command = new StringBuilder();
-                while (command.toString().indexOf(";") == -1) {
-                    String name = reader.readLine();
-                    command.append(name);
-                    String saveCommand = command.substring(0, command.toString().indexOf(";"));
+            System.out.print(" > ");
+            StringBuilder command = new StringBuilder();
+            while (!command.toString().contains(";")) {
+                String name = scanner.nextLine();
+                command.append(name);
+            }
+            String saveCommand = command.substring(0, command.toString().indexOf(";"));
 
-                    if (patternCreate.matcher(saveCommand).matches()) {
-                        createHandler(saveCommand);
-                        System.out.println("Current command is : " + saveCommand);
-                    } else if (patternInsert.matcher(saveCommand).matches()) {
-                        insertHandler(saveCommand);
-                        System.out.println("Current command is : " + saveCommand);
-                    } else if (patternSelect.matcher(saveCommand).matches()) {
-                        selectHandler(saveCommand);
-                        System.out.println("Current command is : " + saveCommand);
-                    } else if (patternDelete.matcher(saveCommand).matches()) {
-                        deleteHandler(saveCommand);
-                        System.out.println("Current command is : " + saveCommand);
-                    } else if (patternExit.matcher(saveCommand).matches()) {
-                        exit = true;
-                    } else {
-                        System.out.println("Error, your command is wrong");
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (patternCreate.matcher(saveCommand).matches()) {
+                createHandler(saveCommand);
+                System.out.println("Current command is : " + saveCommand);
+            } else if (patternInsert.matcher(saveCommand).matches()) {
+                insertHandler(saveCommand);
+                System.out.println("Current command is : " + saveCommand);
+            } else if (patternSelect.matcher(saveCommand).matches()) {
+                selectHandler(saveCommand);
+                System.out.println("Current command is : " + saveCommand);
+            } else if (patternDelete.matcher(saveCommand).matches()) {
+                deleteHandler(saveCommand);
+                System.out.println("Current command is : " + saveCommand);
+            } else if (patternExit.matcher(saveCommand).matches()) {
+                exit = true;
+            } else {
+                System.out.println("Error, your command is wrong");
             }
         }
     }
@@ -72,14 +60,14 @@ public class Main {
     private static void createHandler(String command) {
         System.out.print("Creation of a new table " + " ");
         String cmd = command;
-
+        // 1) get table name from command;
         String[] array = cmd.replaceFirst("( )*[C|c][R|r][E|e][A|a][T|t][E|e]( )*", "")
                 .replaceAll("[(|)|,|;|]", "")
                 .replaceAll("[ ]*[ ]", " ")
                 .split(" ");
         System.out.println(Arrays.toString(array));
         System.out.println("Table name : " + array[0]);
-        String tableName = array[0];  // 1) get table name from command;
+        String tableName = array[0];
         // if table created with this name then error, break
         if (listOfTables.containsKey(tableName)) {
             System.out.println("Table with this name is already created");
@@ -128,50 +116,87 @@ public class Main {
     }
 
     private static void selectHandler(String command) {
-        System.out.print("Select data from table " + " ");
+        //System.out.print("Select data from table " + " ");
         String cmd = command;
-        String[] array1 = cmd.replaceFirst("[ ]*(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)*[ ]*[A-Z, a-z, 0-9]*[ ]*(F|f)(R|r)(O|o)(M|m)[ ]*", "")
+        // 1) get table name from command;
+        String[] array1 = cmd.replaceFirst("[ ]*(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)*[ ]*[A-Z, a-z, 0-9, *]*[ ]*(F|f)(R|r)(O|o)(M|m)[ ]*", "")
                 .replaceAll("[(|)|,|;|]", "")
                 .replaceAll("[ ]*[ ]", " ")
                 .split(" ");
-        System.out.println(Arrays.toString(array1));
-        for (int i = 0; i < array1.length; i++) {
-            System.out.println("Table names : " + array1[i]);
-        }
+
         String tableName = array1[0];
         // if table name is missing then error;
         if (!listOfTables.containsKey(tableName)) {
             System.out.println("Table with this name doesn't exist");
             return;
         }
-        for(List<Integer> list: listOfTablesData.get(tableName)) {
-           /* System.out.println(AsciiTable.getTable(listOfTables.keySet(), listOfTables.values());*/
-            System.out.println(list.toString());
-        }
-
-        /*String[] array = cmd.replaceFirst("[ ]*(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)[ ]*", "")
+        // 2) get column names from command;
+        String[] array = cmd.replaceFirst("[ ]*(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)[ ]*", "")
                 .replaceAll("[ ]*(F|f)(R|r)(O|o)(M|m)*[A-Z, a-z, 0-9]*[ ]*", "")
                 .replaceAll("[(|)|,|;|]", "")
                 .replaceAll("[ ]*[ ]", " ")
                 .split(" ");
-        System.out.println(Arrays.toString(array));
+
+        List<String> allFields = listOfTables.get(tableName);
+        boolean[] flags = new boolean[allFields.size()];
+        int counter = 0;
         for (int i = 0; i < array.length; i++) {
-            System.out.println("      condition : " + array[i]);
-        }*/
-
-
-        // 1) get table name from command;
-        // 2) get column names from command;
+            if (allFields.contains(array[i])) {
+                flags[allFields.indexOf(array[i])] = true;
+                counter++;
+            }
+        }
+        if (array[0].equals("*")) {
+            Arrays.fill(flags, true);
+            counter = allFields.size();
+        } else if (counter < array.length) {
+            System.out.println("List of fields is incorrect for the given table");
+            return;
+        }
         // 3) get WHERE condition;
+        String[] array2 = cmd.replaceFirst("[ ]*(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)*[ ]*[A-Z, a-z, 0-9, * ]*[ ]*(F|f)(R|r)(O|o)(M|m)[ ]*[A-Z, a-z, 0-9]*[ ]*(W|w)(H|h)(E|e)(R|r)(E|e)*[ ]*", "")
+                .replaceAll("[(|)|,|;|]", "")
+                .replaceAll("[ ]*[ ]", " ")
+                .split(" ");
+        if (array2[0].equals("")) {
+            return;
+        } else {
+            for (int i = 0; i < array2.length; i++) {
+                System.out.println("condition names : " + array2[i]);
+            }
+        }
         // 4) read data from table according to condition and print;
+        for (int i = 0; i < counter; i++)
+            System.out.print("================|");
+        System.out.println();
+        for (int i = 0; i < allFields.size(); i++) {
+            if (flags[i]) {
+                System.out.printf("%15s |", allFields.get(i));
+            }
+        }
+        System.out.println();
+        for (int i = 0; i < counter; i++)
+            System.out.print("================|");
+        System.out.println();
+        List<List<Integer>> allFieldsData = listOfTablesData.get(tableName);
+        for (int k = 0; k < allFieldsData.size(); k++) {
+            for (int m = 0; m < allFieldsData.get(k).size(); m++) {
+                if (flags[m])
+                    System.out.printf("%15d |", allFieldsData.get(k).get(m));
+            }
+            System.out.println();
+        }
+        for (int i = 0; i < counter; i++)
+            System.out.print("================|");
+        System.out.println();
 
     }
 
     private static void deleteHandler(String command) {
         System.out.print("Delete data from table " + " ");
         String cmd = command;
-
-        String[] array = cmd.replaceFirst("[ ]*(D|d)(E|e)(L|l)(E|e)(T|t)(E|e)[ ]*", "")
+        // 1) get table name from command;
+        String[] array = cmd.replaceFirst("[ ]*(D|d)(E|e)(L|l)(E|e)(T|t)(E|e)(([ ]*)|([ ]*(F|f)(R|r)(O|o)(M|m)[ ]*))", "")
                 .replaceAll("[(|)|,|;|]", "")
                 .replaceAll("[ ][ ]", " ")
                 .split(" ");
@@ -186,11 +211,7 @@ public class Main {
         }
         listOfTables.remove(tableName);
         listOfTablesData.remove(tableName);
-        /*for (int i = 1; i < array.length; i++) {
-            System.out.println("      field : " + array[i]);
-            // 1) get table name from command;
-            // 2) get WHERE condition;
-            // 3) delete data from table according to condition and print;
-        }*/
+        // 2) get WHERE condition;
+        // 3) delete data from table according to condition and print;
     }
 }
