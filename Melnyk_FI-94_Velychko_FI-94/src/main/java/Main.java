@@ -10,7 +10,7 @@ public class Main {
 
 
         // Auto test
-        SqlParser.commandHandler("create cat (x, y, z)");
+       /*  SqlParser.commandHandler("create cat (x, y, z)");
         SqlParser.commandHandler("create cat (x, y, d, s)");
 
         SqlParser.commandHandler("insert into cat (1, 2, 3)");
@@ -27,9 +27,9 @@ public class Main {
         SqlParser.commandHandler("delete from cat where x > 5 && y < 11");
         SqlParser.commandHandler("select * from cat");
         SqlParser.commandHandler("DELETE FROM cat");
-        SqlParser.commandHandler("select * from cat");
+        SqlParser.commandHandler("select * from cat");*/
 
-        /*
+
         System.out.println("Hello! Enter your command.If you want to finish enter .EXIT");
 
         Scanner scanner = new Scanner(System.in);
@@ -48,6 +48,5 @@ public class Main {
                     SqlParser.commandHandler(fullCommand);
             }
         }
-*/
     }
 }
