@@ -1,4 +1,5 @@
 import de.vandermeer.asciitable.AsciiTable;
+import de.vandermeer.asciitable.CWC_LongestLine;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlExpression;
@@ -157,6 +158,7 @@ public class SqlParser {
 
         // 4) read data from table according to condition and print;
         AsciiTable at = new AsciiTable();
+        at.getRenderer().setCWC(new CWC_LongestLine());
         at.addRule();
 
         ArrayList<String> row = new ArrayList<>();
