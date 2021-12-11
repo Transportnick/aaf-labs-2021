@@ -195,10 +195,13 @@ public class SqlParser {
 
     private static void deleteHandler(String command) {
         // 1) get table name from command;
-        String[] array = command.replaceFirst("[ ]*(D|d)(E|e)(L|l)(E|e)(T|t)(E|e)*[ ]*[A-Z, a-z, 0-9, *]*[ ]*(F|f)(R|r)(O|o)(M|m)[ ]*", "")
+        String[] array = command.replaceFirst("[ ]*(D|d)(E|e)(L|l)(E|e)(T|t)(E|e)*[ ]*", "")
+                .replaceAll("[ ]*(F|f)(R|r)(O|o)(M|m)[ ]*", "")
                 .replaceAll("[(|)|,|;|]", "")
+                //.replaceAll("[=]", "==")
                 .replaceAll("[ ]*[ ]", " ")
                 .split(" ");
+
 
         // if table name is missing then error;
         String tableName = array[0];
