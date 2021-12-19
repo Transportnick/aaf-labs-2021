@@ -10,7 +10,8 @@ public class Main {
 
 
         // Auto test
-       /*  SqlParser.commandHandler("create cat (x, y, z)");
+        /*
+        SqlParser.commandHandler("create cat (x, y, z)");
         SqlParser.commandHandler("create cat (x, y, d, s)");
 
         SqlParser.commandHandler("insert into cat (1, 2, 3)");
@@ -22,12 +23,16 @@ public class Main {
         SqlParser.commandHandler("select a, z, x from cat");
         SqlParser.commandHandler("select z, x from cat");
 
-        SqlParser.commandHandler("select z, x from cat where x > 5 && y < 11");
+        SqlParser.commandHandler("select z, x from cat where (x > 5) & (y < 11)");
 
-        SqlParser.commandHandler("delete from cat where x > 5 && y < 11");
+        SqlParser.commandHandler("delete from cat where (x > 5) & (y < 11)");
+        SqlParser.commandHandler("select * from cat where x>3 ");
+        SqlParser.commandHandler("select * from cat where (x = 4) ");
+        SqlParser.commandHandler("delete cat where x=4");
         SqlParser.commandHandler("select * from cat");
         SqlParser.commandHandler("DELETE FROM cat");
-        SqlParser.commandHandler("select * from cat");*/
+        SqlParser.commandHandler("select * from cat");
+        */
 
 
         System.out.println("Hello! Enter your command.If you want to finish enter .EXIT");

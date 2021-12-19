@@ -1,12 +1,3 @@
-import de.vandermeer.asciitable.AsciiTable;
-import de.vandermeer.asciitable.CWC_LongestLine;
-import org.apache.commons.jexl3.JexlContext;
-import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.JexlExpression;
-import org.apache.commons.jexl3.MapContext;
-import org.apache.commons.jexl3.internal.Engine;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -17,8 +8,8 @@ import java.util.regex.Pattern;
 public class SqlParser {
     private static final String Create = "((C|c)(r|R)(e|E)(a|A)(t|T)(E|e)[ ]*[a-z,A-Z,0-9]*[ ]*[(][a-z,A-Z,0-9, ]*[)]*)";
     private static final String Insert = "[ ]*(((I|i)(N|n)(S|s)(E|e)(R|r)(T|t)[ ]((I|i)(n|N)(T|t)(O|o)))|((I|i)(N|n)(S|s)(E|e)(R|r)(T|t)))[ ]*[A-Z,a-z,0-9]*[ ]*[(][A-Z,a-z,-?0-9, ]*[)]*[ ]*";
-    private static final String Select = "[ ]*(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)[ ]*[A-Z, a-z, 0-9, * ]*[ ]*(F|f)(R|r)(O|o)(M|m)[ ]*[A-Z, a-z, 0-9]*(([ ]*)|([ ]*((W|w)(H|h)(E|e)(R|r)(E|e))*[ ]*[A-Z, a-z, 0-9,=,!=,>,<,>=,<=,+,\\-,*,\\/,&,|,.]*[ ]*))";
-    private static final String Delete = "[ ]*(D|d)(E|e)(L|l)(E|e)(T|t)(E|e)(([ ]*)|([ ]*(F|f)(R|r)(O|o)(M|m)[ ]*))[A-Z, a-z, 0-9]*(([ ]*)|([ ]*((W|w)(H|h)(E|e)(R|r)(E|e))*[ ]*[A-Z, a-z, 0-9,=,!=,>,<,>=,<=,+,\\-,*,\\/,&,|,.]*[ ]*))";
+    private static final String Select = "[ ]*(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)[ ]*[A-Z, a-z, 0-9, * ]*[ ]*(F|f)(R|r)(O|o)(M|m)[ ]*[A-Z, a-z, 0-9]*(([ ]*)|([ ]*((W|w)(H|h)(E|e)(R|r)(E|e))*[ ]*[A-Z, a-z, 0-9,=,!,>,<,+,\\-,*,\\/,&,|,.,(,)]*[ ]*))";
+    private static final String Delete = "[ ]*(D|d)(E|e)(L|l)(E|e)(T|t)(E|e)(([ ]*)|([ ]*(F|f)(R|r)(O|o)(M|m)[ ]*))[A-Z, a-z, 0-9]*(([ ]*)|([ ]*((W|w)(H|h)(E|e)(R|r)(E|e))*[ ]*[A-Z, a-z, 0-9,=,!,>,<,+,\\-,*,\\/,&,|,.,(,)]*[ ]*))";
     private static final Pattern patternCreate = Pattern.compile(Create);
     private static final Pattern patternInsert = Pattern.compile(Insert);
     private static final Pattern patternSelect = Pattern.compile(Select);
@@ -63,7 +54,7 @@ public class SqlParser {
             System.out.println("Error: Table with this name is already created");
             return;
         }
-        if(array.length<2){
+        if (array.length < 2) {
             System.out.println("Error: Columns not found");
             return;
         }
@@ -146,53 +137,47 @@ public class SqlParser {
             }
         }
 
-
         // 3) get WHERE condition;
-        JexlExpression expression = null;
+        MathBoolExpressionParser expression = null;
         if (indexOfWhere > -1) {
             cmd = command.substring(indexOfWhere + "where".length());
-            JexlEngine jexl = new Engine();
-            expression = jexl.createExpression(cmd);
+            expression = new MathBoolExpressionParser(cmd);
         }
-
 
         // 4) read data from table according to condition and print;
-        AsciiTable at = new AsciiTable();
-        at.getRenderer().setCWC(new CWC_LongestLine());
-        at.addRule();
+        for (int i = 0; i < array.length; i++)
+            System.out.print("================|");
+        System.out.println();
 
-        ArrayList<String> row = new ArrayList<>();
         for (String s : array) {
-            row.add(s);
+            System.out.printf("%15s |", s);
         }
-        if (row.size() > 0)
-            at.addRow(row);
-        row.clear();
+        System.out.println();
 
-        at.addRule();
+        for (int i = 0; i < array.length; i++)
+            System.out.print("================|");
+        System.out.println();
 
         List<List<Integer>> allFieldsData = listOfTablesData.get(tableName);
         for (int k = 0; k < allFieldsData.size(); k++) {
 
-            JexlContext jexlContext = new MapContext();
-            for (int i = 0; i < allFields.size(); i++) {
-                jexlContext.set(allFields.get(i), allFieldsData.get(k).get(i));
-            }
+            if (expression != null)
+                for (int i = 0; i < allFields.size(); i++) {
+                    expression.addNewVariable(allFields.get(i), allFieldsData.get(k).get(i));
+                }
 
-            if (expression == null || (Boolean) expression.evaluate(jexlContext)) {
+            if (expression == null || (Boolean) expression.calculate()) {
                 for (int i = 0; i < array.length; i++) {
                     int index = allFields.indexOf(array[i]);
-                    row.add(Integer.toString(allFieldsData.get(k).get(index)));
+                    System.out.printf("%15s |", allFieldsData.get(k).get(index));
                 }
-            }
-            if (row.size() > 0) {
-                at.addRow(row);
-                row.clear();
-                at.addRule();
+                System.out.println();
+                for (int i = 0; i < array.length; i++)
+                    System.out.print("================|");
+                System.out.println();
             }
         }
-        String rend = at.render();
-        System.out.println(rend);
+        System.out.println();
     }
 
     private static void deleteHandler(String command) {
@@ -200,10 +185,8 @@ public class SqlParser {
         String[] array = command.replaceFirst("[ ]*(D|d)(E|e)(L|l)(E|e)(T|t)(E|e)*[ ]*", "")
                 .replaceAll("[ ]*(F|f)(R|r)(O|o)(M|m)[ ]*", "")
                 .replaceAll("[(|)|,|;|]", "")
-                //.replaceAll("[=]", "==")
                 .replaceAll("[ ]*[ ]", " ")
                 .split(" ");
-
 
         // if table name is missing then error;
         String tableName = array[0];
@@ -220,8 +203,7 @@ public class SqlParser {
         } else {
             // get WHERE condition;
             String cmd = command.substring(indexOfWhere + "where".length());
-            JexlEngine jexl = new Engine();
-            JexlExpression expression = jexl.createExpression(cmd);
+            MathBoolExpressionParser expression = new MathBoolExpressionParser(cmd);
 
             int counter = 0;
             List<String> allFields = listOfTables.get(tableName);
@@ -229,12 +211,12 @@ public class SqlParser {
 
             for (int k = 0; k < allFieldsData.size(); k++) {
 
-                JexlContext jexlContext = new MapContext();
-                for (int i = 0; i < allFields.size(); i++) {
-                    jexlContext.set(allFields.get(i), allFieldsData.get(k).get(i));
-                }
+                if (expression != null)
+                    for (int i = 0; i < allFields.size(); i++) {
+                        expression.addNewVariable(allFields.get(i), allFieldsData.get(k).get(i));
+                    }
 
-                if ((Boolean) expression.evaluate(jexlContext)) {
+                if ((Boolean) expression.calculate()) {
                     allFieldsData.remove(k);
                     k--;
                     counter++;
