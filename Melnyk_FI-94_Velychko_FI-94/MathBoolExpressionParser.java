@@ -1,5 +1,3 @@
-import org.apache.commons.lang3.math.NumberUtils;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -144,6 +142,18 @@ public class MathBoolExpressionParser {
         }
     }
 
+    private static boolean isDouble(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
     public Object evaluatePolishNotation() {
 
         LinkedList<Object> queue = new LinkedList<>();
@@ -241,7 +251,7 @@ public class MathBoolExpressionParser {
                         break;
                 }
             } else {
-                if (NumberUtils.isNumber(token)) {
+                if (isDouble(token)) {
                     queue.addFirst(Double.parseDouble(token));
                 } else if (token.equalsIgnoreCase("true")) {
                     queue.addFirst(true);
