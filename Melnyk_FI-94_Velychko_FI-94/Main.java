@@ -11,7 +11,7 @@ public class Main {
 
         // Auto test
         /*
-        SqlParser.commandHandler("create cat (x, y, z)");
+        SqlParser.commandHandler("create cat (x INDEXED, y, z)");
         SqlParser.commandHandler("create cat (x, y, d, s)");
 
         SqlParser.commandHandler("insert into cat (1, 2, 3)");

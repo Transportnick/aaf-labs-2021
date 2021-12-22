@@ -23,6 +23,10 @@ public class MathBoolExpressionParser {
         parseToPolishNotation();
     }
 
+    public boolean isVarUsed(String varName) {
+        return resultList.contains(varName);
+    }
+    
     private static boolean isOperator(String token) {
         return (operators1.contains(token) ||
                 operators2.contains(token) ||
